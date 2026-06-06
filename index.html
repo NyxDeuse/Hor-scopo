@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Céu & Signo — Horóscopo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav>
+  <a href="#" class="nav-logo">Céu & Signo</a>
+  <ul class="nav-links">
+    <li><a href="#signos">Signos</a></li>
+    <li><a href="#leitura">Leitura</a></li>
+    <li><a href="#mapa">Mapa Natal</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <canvas id="stars"></canvas>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Astrologia · Autoconhecimento</p>
+    <h1 class="hero-title">O céu fala.<br><em>Você escuta?</em></h1>
+    <p class="hero-sub">Descubra o que os astros revelam sobre sua essência,<br>seus padrões e o tempo que você atravessa agora.</p>
+    <div class="hero-cta">
+      <a href="#mapa" class="btn-primary"><span>Descobrir meu mapa</span></a>
+      <a href="#signos" class="btn-secondary">Ver os signos</a>
+    </div>
+  </div>
+</section>
+
+<section id="signos" class="signs-section">
+  <div class="section-header reveal">
+    <span class="section-label">Os doze</span>
+    <h2 class="section-title">Os guardiões do zodíaco</h2>
+  </div>
+  <div class="signs-grid" id="signsGrid"></div>
+</section>
+
+<section id="leitura" class="reading-section">
+  <div class="reading-inner">
+    <div class="reading-text reveal">
+      <span class="reading-label">Leitura astral</span>
+      <h2 class="reading-title">Mais do que previsões — reconhecimento</h2>
+      <p class="reading-body">A astrologia não diz o que vai acontecer. Ela revela a qualidade do tempo, os ritmos da sua alma e os padrões que você carrega. Uma bússola, não um destino.</p>
+      <a href="#mapa" class="btn-primary"><span>Iniciar leitura</span></a>
+    </div>
+    <div class="reading-visual reveal">
+      <div class="astro-circle">
+        <div class="ac-outer">
+          <div class="ac-dot" style="top:-2px;left:50%;transform:translateX(-50%)"></div>
+          <div class="ac-dot" style="top:50%;right:-2px;transform:translateY(-50%)"></div>
+          <div class="ac-dot" style="bottom:-2px;left:50%;transform:translateX(-50%)"></div>
+          <div class="ac-dot" style="top:50%;left:-2px;transform:translateY(-50%)"></div>
+        </div>
+        <div class="ac-inner"></div>
+        <div class="ac-core">✦</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="margin: 0 auto;"></div>
+
+<section class="pillars">
+  <div class="pillars-inner">
+    <div class="pillar reveal">
+      <div class="pillar-num">01</div>
+      <h3 class="pillar-title">Sol, Lua e Ascendente</h3>
+      <p class="pillar-body">A trindade central do mapa: identidade, mundo emocional e a persona que você projeta. Três camadas de uma mesma essência.</p>
+    </div>
+    <div class="pillar reveal">
+      <div class="pillar-num">02</div>
+      <h3 class="pillar-title">Trânsitos e Ciclos</h3>
+      <p class="pillar-body">Os planetas continuam se movendo depois que você nasce. Cada trânsito ativa uma parte diferente do seu mapa — e da sua vida.</p>
+    </div>
+    <div class="pillar reveal">
+      <div class="pillar-num">03</div>
+      <h3 class="pillar-title">Casas e Ângulos</h3>
+      <p class="pillar-body">As doze casas mostram onde cada energia se manifesta: trabalho, amor, família, propósito. O mapa como arquitetura da existência.</p>
+    </div>
+  </div>
+</section>
+
+<section id="mapa" class="selector-section">
+  <div class="section-header reveal">
+    <span class="section-label">Mapa natal</span>
+    <h2 class="section-title">Encontre seu signo solar</h2>
+  </div>
+  <div class="birth-form reveal" id="birthForm">
+    <div class="form-row">
+      <div class="form-field">
+        <label>Dia</label>
+        <input type="number" id="day" min="1" max="31" placeholder="Dia">
+      </div>
+      <div class="form-field">
+        <label>Mês</label>
+        <select id="month">
+          <option value="" disabled selected>Selecione</option>
+          <option value="1">Janeiro</option><option value="2">Fevereiro</option>
+          <option value="3">Março</option><option value="4">Abril</option>
+          <option value="5">Maio</option><option value="6">Junho</option>
+          <option value="7">Julho</option><option value="8">Agosto</option>
+          <option value="9">Setembro</option><option value="10">Outubro</option>
+          <option value="11">Novembro</option><option value="12">Dezembro</option>
+        </select>
+      </div>
+    </div>
+    <button class="reveal-btn" onclick="revealSign()"><span>Revelar meu signo</span></button>
+    <div class="result-panel" id="resultPanel">
+      <div class="result-sign" id="resultSign"></div>
+      <div class="result-desc" id="resultDesc"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-logo">Céu & Signo</span>
+  <span class="footer-note">✦ Cada vida, um céu único</span>
+</footer>
+
+<script>
+// ── CURSOR ──
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX;
+  my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top  = my + 'px';
+  ring.style.left   = mx + 'px';
+  ring.style.top    = my + 'px';
+});
+
+//STARS
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let stars = [];
+
+function resizeCanvas() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  stars = Array.from({ length: 140 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.2 + 0.2,
+    speed: Math.random() * 0.008 + 0.003,
+    offset: Math.random() * Math.PI * 2
+  }));
+}
+
+function drawStars(t) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    const alpha = 0.15 + 0.35 * Math.sin(t * s.speed + s.offset);
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(201, 169, 110, ${alpha})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+requestAnimationFrame(drawStars);
+
+//SIGNS DATA
+const signs = [
+  { name: 'Áries',       glyph: '♈', date: '21 Mar – 19 Abr' },
+  { name: 'Touro',       glyph: '♉', date: '20 Abr – 20 Mai' },
+  { name: 'Gêmeos',      glyph: '♊', date: '21 Mai – 20 Jun' },
+  { name: 'Câncer',      glyph: '♋', date: '21 Jun – 22 Jul' },
+  { name: 'Leão',        glyph: '♌', date: '23 Jul – 22 Ago' },
+  { name: 'Virgem',      glyph: '♍', date: '23 Ago – 22 Set' },
+  { name: 'Libra',       glyph: '♎', date: '23 Set – 22 Out' },
+  { name: 'Escorpião',   glyph: '♏', date: '23 Out – 21 Nov' },
+  { name: 'Sagitário',   glyph: '♐', date: '22 Nov – 21 Dez' },
+  { name: 'Capricórnio', glyph: '♑', date: '22 Dez – 19 Jan' },
+  { name: 'Aquário',     glyph: '♒', date: '20 Jan – 18 Fev' },
+  { name: 'Peixes',      glyph: '♓', date: '19 Fev – 20 Mar' },
+];
+
+const grid = document.getElementById('signsGrid');
+signs.forEach((s, i) => {
+  const card = document.createElement('div');
+  card.className = 'sign-card';
+  card.innerHTML = `<span class="sign-glyph">${s.glyph}</span><span class="sign-name">${s.name}</span><span class="sign-date">${s.date}</span>`;
+  card.style.transitionDelay = `${i * 0.04}s`;
+  grid.appendChild(card);
+});
+
+//SIGN CALCULATOR
+function getSign(day, month) {
+  const m = parseInt(month), d = parseInt(day);
+  const bounds = [
+    [3,21,'Áries'],[4,20,'Touro'],[5,21,'Gêmeos'],[6,21,'Câncer'],
+    [7,23,'Leão'],[8,23,'Virgem'],[9,23,'Libra'],[10,23,'Escorpião'],
+    [11,22,'Sagitário'],[12,22,'Capricórnio'],[1,20,'Aquário'],[2,19,'Peixes'],[3,21,'Áries']
+  ];
+  for (let i = 0; i < bounds.length - 1; i++) {
+    const [bm, bd, name] = bounds[i];
+    const [nm, nd] = bounds[i+1];
+    if ((m === bm && d >= bd) || (m === nm && d < nd)) return name;
+  }
+  return 'Peixes';
+}
+
+//INPUT CONFIG
+document.getElementById("day").addEventListener("input", function(){
+    this.value = this.value.replace(/[^0-9]/g, "")
+    const value = parseInt(this.value)
+    const month = parseInt(document.getElementById("month").value)
+    const months = [4, 6, 9, 11]
+
+    if (value > 31 || this.value.length > 2){
+      this.value = this.value.slice(0, -1)
+    }
+    if (value === 31 && months.includes(month)){
+      this.value = 30
+    }
+    if (value === 30 && month === 2 || value === 31 && month === 2){
+      this.value = 29
+    }
+})
+
+document.getElementById("month").addEventListener("change", function(){
+    const months = [4, 6, 9, 11]
+    const value = parseInt(this.value)
+    const day = parseInt(document.getElementById("day").value)
+
+    if (months.includes(value) && day === 31){
+      document.getElementById("day").value = 30
+    }
+    if (this.value === "2" && day === 31 || this.value === "2" && day === 30){
+      document.getElementById("day").value = 29
+    }
+})
+
+
+const signDescs = {
+  'Áries':       'Pioneiro e corajoso, você age antes de pensar. O fogo cardinal que inicia tudo.',
+  'Touro':       'Paciente e sensorial, você constrói com constância. A terra que sustenta e nutre.',
+  'Gêmeos':      'Curioso e adaptável, você conecta mundos. O ar que circula e questiona tudo.',
+  'Câncer':      'Intuitivo e protetor, você sente com profundidade. A água que abraça e lembra.',
+  'Leão':        'Criativo e generoso, você ilumina o espaço ao redor. O fogo que irradia e inspira.',
+  'Virgem':      'Preciso e cuidadoso, você aprimora tudo que toca. A terra que discerne e serve.',
+  'Libra':       'Justo e relacional, você busca harmonia em tudo. O ar que pondera e conecta.',
+  'Escorpião':   'Intenso e transformador, você mergulha fundo. A água que revela e regenera.',
+  'Sagitário':   'Livre e filosófico, você expande horizontes. O fogo que explora e inspira.',
+  'Capricórnio': 'Disciplinado e ambicioso, você constrói duradouros. A terra que persiste e conquista.',
+  'Aquário':     'Original e visionário, você quebra padrões. O ar que inova e une diferenças.',
+  'Peixes':      'Empático e transcendente, você dissolve fronteiras. A água que sonha e conecta almas.',
+};
+
+function revealSign() {
+  const day   = document.getElementById('day').value;
+  const month = document.getElementById('month').value;
+  if (!day || !month) { alert('Por favor, preencha dia e mês.'); return; }
+  const sign     = getSign(day, month);
+  const signData = signs.find(s => s.name === sign);
+  document.getElementById('resultSign').textContent = `${signData?.glyph || ''} ${sign}`;
+  document.getElementById('resultDesc').textContent = signDescs[sign] || '';
+  const panel = document.getElementById('resultPanel');
+  panel.classList.remove('show');
+  setTimeout(() => panel.classList.add('show'), 50);
+}
+
+// ── INTERSECTION OBSERVER ──
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal, .sign-card').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

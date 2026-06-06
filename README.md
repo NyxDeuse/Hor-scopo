@@ -1,1 +1,1 @@
-# Hor-scopo
+# Horoscopo

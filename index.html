@@ -34,6 +34,17 @@
   </div>
 </section>
 
+  <div id="sign-modal">
+  <div id="modal-content">
+    <button id="modal-close">✕</button>
+    <span id="modal-glyph"></span>
+    <h2 id="modal-name"></h2>
+    <p id="modal-date"></p>
+    <p id="modal-desc"></p>
+  </div>
+</div>
+
+
 <section id="signos" class="signs-section">
   <div class="section-header reveal">
     <span class="section-label">Os doze</span>
@@ -172,7 +183,9 @@ resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 requestAnimationFrame(drawStars);
 
-//SIGNS DATA
+
+
+//SIGNS INFO
 const signs = [
   { name: 'Áries',       glyph: '♈', date: '21 Mar – 19 Abr' },
   { name: 'Touro',       glyph: '♉', date: '20 Abr – 20 Mai' },
@@ -188,12 +201,55 @@ const signs = [
   { name: 'Peixes',      glyph: '♓', date: '19 Fev – 20 Mar' },
 ];
 
+const signDescs = {
+  'Áries':       'Pioneiro e corajoso, você age antes de pensar. O fogo cardinal que inicia tudo.',
+  'Touro':       'Paciente e sensorial, você constrói com constância. A terra que sustenta e nutre.',
+  'Gêmeos':      'Curioso e adaptável, você conecta mundos. O ar que circula e questiona tudo.',
+  'Câncer':      'Intuitivo e protetor, você sente com profundidade. A água que abraça e lembra.',
+  'Leão':        'Criativo e generoso, você ilumina o espaço ao redor. O fogo que irradia e inspira.',
+  'Virgem':      'Preciso e cuidadoso, você aprimora tudo que toca. A terra que discerne e serve.',
+  'Libra':       'Justo e relacional, você busca harmonia em tudo. O ar que pondera e conecta.',
+  'Escorpião':   'Intenso e transformador, você mergulha fundo. A água que revela e regenera.',
+  'Sagitário':   'Livre e filosófico, você expande horizontes. O fogo que explora e inspira.',
+  'Capricórnio': 'Disciplinado e ambicioso, você constrói duradouros. A terra que persiste e conquista.',
+  'Aquário':     'Original e visionário, você quebra padrões. O ar que inova e une diferenças.',
+  'Peixes':      'Empático e transcendente, você dissolve fronteiras. A água que sonha e conecta almas.',
+};
+
+//SIGN DISPLAY
+function signModal(s){
+  const modal  = document.getElementById("sign-modal")
+  const glyph = document.getElementById("modal-glyph")
+  const title = document.getElementById("modal-name")
+  const date = document.getElementById("modal-date")
+  const desc = document.getElementById("modal-desc")
+  
+  glyph.textContent = s.glyph
+  title.textContent = s.name
+  date.textContent = s.date
+  desc.textContent = signDescs[s.name]
+  
+  modal.classList.add("open")
+  }
+
+//EXIT MODAL BUTTON
+document.getElementById("modal-close").addEventListener("click",function(){
+  document.getElementById("sign-modal").classList.remove("open")
+})
+
+document.addEventListener("keydown", function(event){
+  if (event.key === "Escape"){
+    document.getElementById("sign-modal").classList.remove("open")
+  }
+})
+
 const grid = document.getElementById('signsGrid');
 signs.forEach((s, i) => {
   const card = document.createElement('div');
   card.className = 'sign-card';
   card.innerHTML = `<span class="sign-glyph">${s.glyph}</span><span class="sign-name">${s.name}</span><span class="sign-date">${s.date}</span>`;
   card.style.transitionDelay = `${i * 0.04}s`;
+  card.onclick = () => signModal(s)
   grid.appendChild(card);
 });
 
@@ -214,51 +270,53 @@ function getSign(day, month) {
 }
 
 //INPUT CONFIG
-document.getElementById("day").addEventListener("input", function(){
-    this.value = this.value.replace(/[^0-9]/g, "")
-    const value = parseInt(this.value)
-    const month = parseInt(document.getElementById("month").value)
-    const months = [4, 6, 9, 11]
+function inputConfig(){
+  //Day
+  document.getElementById("day").addEventListener("input", function(){
+      this.value = this.value.replace(/[^0-9]/g, "")
+      const value = parseInt(this.value)
+      const month = parseInt(document.getElementById("month").value)
+      const months = [4, 6, 9, 11]
 
-    if (value > 31 || this.value.length > 2){
-      this.value = this.value.slice(0, -1)
-    }
-    if (value === 31 && months.includes(month)){
-      this.value = 30
-    }
-    if (value === 30 && month === 2 || value === 31 && month === 2){
-      this.value = 29
-    }
-})
+      if (value > 31 || this.value.length > 2){
+        this.value = this.value.slice(0, -1)
+      }
+      if (value === 31 && months.includes(month)){
+        this.value = 30
+      }
+      if (value === 30 && month === 2 || value === 31 && month === 2){
+        this.value = 29
+      }
+  })
 
-document.getElementById("month").addEventListener("change", function(){
-    const months = [4, 6, 9, 11]
-    const value = parseInt(this.value)
-    const day = parseInt(document.getElementById("day").value)
-
-    if (months.includes(value) && day === 31){
-      document.getElementById("day").value = 30
+  document.getElementById("day").addEventListener("keydown", function(event){
+    if (event.key === "Enter"){
+      document.getElementsByClassName("reveal-btn")[0].click()
     }
-    if (this.value === "2" && day === 31 || this.value === "2" && day === 30){
-      document.getElementById("day").value = 29
+  })
+
+  //Month
+  document.getElementById("month").addEventListener("change", function(){
+      const months = [4, 6, 9, 11]
+      const value = parseInt(this.value)
+      const day = parseInt(document.getElementById("day").value)
+
+      if (months.includes(value) && day === 31){
+        document.getElementById("day").value = 30
+      }
+      if (this.value === "2" && day === 31 || this.value === "2" && day === 30){
+        document.getElementById("day").value = 29
+      }
+  })
+
+  document.getElementById("month").addEventListener("keydown",function(event){
+    if (event.key === "Enter"){
+      document.getElementsByClassName("reveal-btn")[0].click()
     }
-})
+  })
+  }
 
-
-const signDescs = {
-  'Áries':       'Pioneiro e corajoso, você age antes de pensar. O fogo cardinal que inicia tudo.',
-  'Touro':       'Paciente e sensorial, você constrói com constância. A terra que sustenta e nutre.',
-  'Gêmeos':      'Curioso e adaptável, você conecta mundos. O ar que circula e questiona tudo.',
-  'Câncer':      'Intuitivo e protetor, você sente com profundidade. A água que abraça e lembra.',
-  'Leão':        'Criativo e generoso, você ilumina o espaço ao redor. O fogo que irradia e inspira.',
-  'Virgem':      'Preciso e cuidadoso, você aprimora tudo que toca. A terra que discerne e serve.',
-  'Libra':       'Justo e relacional, você busca harmonia em tudo. O ar que pondera e conecta.',
-  'Escorpião':   'Intenso e transformador, você mergulha fundo. A água que revela e regenera.',
-  'Sagitário':   'Livre e filosófico, você expande horizontes. O fogo que explora e inspira.',
-  'Capricórnio': 'Disciplinado e ambicioso, você constrói duradouros. A terra que persiste e conquista.',
-  'Aquário':     'Original e visionário, você quebra padrões. O ar que inova e une diferenças.',
-  'Peixes':      'Empático e transcendente, você dissolve fronteiras. A água que sonha e conecta almas.',
-};
+inputConfig()
 
 function revealSign() {
   const day   = document.getElementById('day').value;
